@@ -1,42 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scranity - Unity Block Editor</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scranity Blockly</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://unpkg.com/blockly/blockly.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Scranity</h1>
-    <p>Scratch-like editor that generates Unity C# scripts</p>
-  </header>
+<header>
+  <h1>Scranity</h1>
+  <p>Scratch-style Unity C# Blockly Editor</p>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Project</h2>
+    <button onclick="newScript()">+ New Script</button>
+    <button onclick="exportProject()">Export Blocks JSON</button>
+    <button onclick="exportCode()">Export C#</button>
+    <button onclick="loadExtension()">Load Custom Extension</button>
+    <select id="scriptList" onchange="switchScript()"></select>
+  </aside>
 
   <main>
-    <aside class="sidebar">
-      <h2>Blocks</h2>
-      <button onclick="addBlock('Start')">Start()</button>
-      <button onclick="addBlock('Update')">Update()</button>
-      <button onclick="addBlock('DebugLog')">Debug.Log()</button>
-      <button onclick="addBlock('MoveForward')">Move Forward</button>
-      <button onclick="addBlock('If')">If Statement</button>
-      <button onclick="createScript()">+ New Script</button>
-    </aside>
-
-    <section class="workspace">
-      <div class="topbar">
-        <select id="scriptList" onchange="switchScript()"></select>
-        <button onclick="exportProject()">Export Project JSON</button>
-        <button onclick="exportCSharp()">Export C#</button>
-      </div>
-
-      <div id="editor"></div>
-
-      <h3>Generated C# Preview</h3>
-      <pre id="codePreview"></pre>
-    </section>
+    <div id="blocklyDiv"></div>
+    <h3>Generated C# Preview</h3>
+    <pre id="preview"></pre>
   </main>
+</div>
 
-  <script src="app.js"></script>
+<xml id="toolbox" style="display:none"></xml>
+
+<script src="unity-blocks.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

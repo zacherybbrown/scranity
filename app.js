@@ -1,109 +1,110 @@
-let project = {};
+
+let workspace;
+let scripts = {};
 let currentScript = null;
 
-function createScript() {
+function toolboxXml() {
+  const toolbox = document.getElementById("toolbox");
+  toolbox.innerHTML = "<category name='Unity'></category>";
+  const cat = toolbox.querySelector("category");
+
+  SCRANITY_UNITY_BLOCKS.forEach(block => {
+    Blockly.Blocks[block.type] = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField(block.label);
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour(230); // Scratch-like orange
+      }
+    };
+
+    const xml = document.createElement("block");
+    xml.setAttribute("type", block.type);
+    cat.appendChild(xml);
+  });
+
+  workspace = Blockly.inject("blocklyDiv", {
+    toolbox: toolbox
+  });
+
+  workspace.addChangeListener(updatePreview);
+}
+
+function newScript() {
   const name = prompt("Script name?");
   if (!name) return;
-
-  project[name] = [];
+  scripts[name] = "";
   currentScript = name;
   refreshScripts();
-  renderBlocks();
 }
 
 function refreshScripts() {
   const list = document.getElementById("scriptList");
   list.innerHTML = "";
-
-  Object.keys(project).forEach(name => {
+  Object.keys(scripts).forEach(name => {
     const option = document.createElement("option");
     option.value = name;
     option.textContent = name;
     if (name === currentScript) option.selected = true;
     list.appendChild(option);
   });
-
-  updateCodePreview();
 }
 
 function switchScript() {
-  currentScript = document.getElementById("scriptList").value;
-  renderBlocks();
-}
-
-function addBlock(type) {
-  if (!currentScript) {
-    alert("Create a script first.");
-    return;
+  if (currentScript) {
+    scripts[currentScript] = Blockly.Xml.domToText(
+      Blockly.Xml.workspaceToDom(workspace)
+    );
   }
 
-  project[currentScript].push({ type });
-  renderBlocks();
+  currentScript = document.getElementById("scriptList").value;
+  workspace.clear();
+
+  if (scripts[currentScript]) {
+    const dom = Blockly.Xml.textToDom(scripts[currentScript]);
+    Blockly.Xml.domToWorkspace(dom, workspace);
+  }
+
+  updatePreview();
 }
 
-function renderBlocks() {
-  const editor = document.getElementById("editor");
-  editor.innerHTML = "";
+function generateCode() {
+  if (!currentScript) return "";
+  let code = "using UnityEngine;\n\n";
+  code += `public class ${currentScript} : MonoBehaviour\n{\n`;
 
-  if (!currentScript) return;
-
-  project[currentScript].forEach((block, i) => {
-    const div = document.createElement("div");
-    div.className = "block";
-    div.textContent = `${i + 1}. ${block.type}`;
-    editor.appendChild(div);
-  });
-
-  updateCodePreview();
-}
-
-function generateCode(name) {
-  let code = `using UnityEngine;\n\npublic class ${name} : MonoBehaviour\n{\n`;
-
-  const blocks = project[name] || [];
-
-  blocks.forEach(block => {
-    switch (block.type) {
-      case "Start":
-        code += "    void Start()\n    {\n    }\n\n";
-        break;
-      case "Update":
-        code += "    void Update()\n    {\n    }\n\n";
-        break;
-      case "DebugLog":
-        code += '    Debug.Log("Hello from Scranity!");\n';
-        break;
-      case "MoveForward":
-        code += "    transform.Translate(Vector3.forward * Time.deltaTime);\n";
-        break;
-      case "If":
-        code += "    if (true)\n    {\n    }\n";
-        break;
-    }
+  const blocks = workspace.getAllBlocks(false);
+  blocks.forEach(b => {
+    code += `    // ${b.type}\n`;
   });
 
   code += "}\n";
   return code;
 }
 
-function updateCodePreview() {
-  const preview = document.getElementById("codePreview");
-  if (!currentScript) {
-    preview.textContent = "";
-    return;
-  }
-  preview.textContent = generateCode(currentScript);
+function updatePreview() {
+  document.getElementById("preview").textContent = generateCode();
 }
 
 function exportProject() {
-  const blob = new Blob([JSON.stringify(project, null, 2)], { type: "application/json" });
+  if (currentScript) {
+    scripts[currentScript] = Blockly.Xml.domToText(
+      Blockly.Xml.workspaceToDom(workspace)
+    );
+  }
+
+  const blob = new Blob([JSON.stringify(scripts, null, 2)], {type:"application/json"});
   download(blob, "scranity-project.json");
 }
 
-function exportCSharp() {
-  if (!currentScript) return;
-  const blob = new Blob([generateCode(currentScript)], { type: "text/plain" });
-  download(blob, currentScript + ".cs");
+function exportCode() {
+  const blob = new Blob([generateCode()], {type:"text/plain"});
+  download(blob, (currentScript || "Script") + ".cs");
+}
+
+function loadExtension() {
+  alert("Extension system scaffold ready: load custom block JSON + generators here.");
 }
 
 function download(blob, filename) {
@@ -112,3 +113,5 @@ function download(blob, filename) {
   a.download = filename;
   a.click();
 }
+
+window.onload = toolboxXml;
