@@ -3,36 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scranity Blockly</title>
+<title>Scranity True Codegen</title>
 <link rel="stylesheet" href="style.css">
 <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 </head>
 <body>
 <header>
   <h1>Scranity</h1>
-  <p>Scratch-style Unity C# Blockly Editor</p>
+  <p>Real Blockly → Real Unity C# Generator</p>
 </header>
 
 <div class="layout">
   <aside class="sidebar">
-    <h2>Project</h2>
     <button onclick="newScript()">+ New Script</button>
-    <button onclick="exportProject()">Export Blocks JSON</button>
     <button onclick="exportCode()">Export C#</button>
-    <button onclick="loadExtension()">Load Custom Extension</button>
     <select id="scriptList" onchange="switchScript()"></select>
   </aside>
 
   <main>
     <div id="blocklyDiv"></div>
-    <h3>Generated C# Preview</h3>
+    <h3>C# Preview</h3>
     <pre id="preview"></pre>
   </main>
 </div>
 
-<xml id="toolbox" style="display:none"></xml>
+<xml id="toolbox" style="display:none">
+  <category name="Events">
+    <block type="unity_start"></block>
+    <block type="unity_update"></block>
+  </category>
+  <category name="Logic">
+    <block type="unity_if"></block>
+  </category>
+  <category name="Actions">
+    <block type="unity_debug_log"></block>
+    <block type="unity_move_forward"></block>
+    <block type="unity_rotate_y"></block>
+  </category>
+</xml>
 
-<script src="unity-blocks.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
