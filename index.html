@@ -1,1 +1,42 @@
-index.html here
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scranity - Unity Block Editor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Scranity</h1>
+    <p>Scratch-like editor that generates Unity C# scripts</p>
+  </header>
+
+  <main>
+    <aside class="sidebar">
+      <h2>Blocks</h2>
+      <button onclick="addBlock('Start')">Start()</button>
+      <button onclick="addBlock('Update')">Update()</button>
+      <button onclick="addBlock('DebugLog')">Debug.Log()</button>
+      <button onclick="addBlock('MoveForward')">Move Forward</button>
+      <button onclick="addBlock('If')">If Statement</button>
+      <button onclick="createScript()">+ New Script</button>
+    </aside>
+
+    <section class="workspace">
+      <div class="topbar">
+        <select id="scriptList" onchange="switchScript()"></select>
+        <button onclick="exportProject()">Export Project JSON</button>
+        <button onclick="exportCSharp()">Export C#</button>
+      </div>
+
+      <div id="editor"></div>
+
+      <h3>Generated C# Preview</h3>
+      <pre id="codePreview"></pre>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
